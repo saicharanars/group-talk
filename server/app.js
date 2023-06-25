@@ -5,7 +5,10 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 var cors = require("cors");
-app.use(cors());
+app.use(cors({
+    origin:"http://localhost:4000/",
+    methods:["GET","POST","PUT","DELETE"],
+}));
 app.use(bodyParser.json({ extended: false }));
 const { sequelize } = require('./models/user');
 const Users = require("./models/user");
