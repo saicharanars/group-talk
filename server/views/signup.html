@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/daisyui/3.1.6/full.min.css" integrity="sha512-XCyMGudVghtcrEkHUSNd/OvlbxUYXLeI0bYO4jm3Tn1olsupuMnMmRRecHPy0kY/AJI2gc6mTzzCPY5DCsPRCg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <script src="https://cdn.tailwindcss.com"></script>
+  
 </head>
 <body>
     <section class="gradient-form h-full bg-neutral-200 dark:bg-neutral-700">
@@ -20,20 +21,20 @@
                     <div class="md:mx-6 md:p-12">
                       <!--Logo-->
                       <div class="text-center">
-                          <img class="mx-auto w-48" src="../public/Web-capture_25-6-2023_13349_looka.com-_1_.webp" alt="filled-chat"/>  
+                          <img class="mx-auto w-48" src="/Web-capture_25-6-2023_13349_looka.com-_1_.webp" alt="filled-chat"/>  
                         <h4 class="mb-12 mt-1 pb-1 text-xl font-semibold">
                           We are The Lotus Team
                         </h4>
                       </div>
       
-                      <form>
+                      <form onsubmit="user(event)">
                         <p class="mb-4">Please login to your account</p>
                         <!--Username input-->
                         <div class="relative mb-4" >
                           <input
                             type="text"
                             class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
-                            id="exampleFormControlInput1"
+                            id="username"
                             placeholder="Username" />
                           <label
                             for="exampleFormControlInput1"
@@ -57,7 +58,7 @@
                             <input
                               type="text"
                               class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
-                              id="phone number"
+                              id="phonenumber"
                               placeholder="phone number" />
                             <label
                               for="exampleFormControlInput1"
@@ -96,7 +97,7 @@
                         <div class="mb-12 pb-1 pt-1 text-center">
                           <button
                             class="mb-3 inline-block w-full rounded px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]"
-                            type="button"
+                            type="submit"
                             data-te-ripple-init
                             data-te-ripple-color="light"
                             style="
@@ -147,6 +148,10 @@
           </div>
         </div>
       </section>
-  
+      <script src="/signup.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+      integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+      crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 </body>
 </html>
