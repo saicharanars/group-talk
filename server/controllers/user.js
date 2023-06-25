@@ -41,3 +41,53 @@ exports.postSignup = async (req, res, next) => {
     console.log(rootDir)
     res.sendFile(path.join(rootDir, "views", "signup.html"));
   };
+  exports.getLogin = async (req, res, next) => {
+    res.sendFile(path.join(rootDir, "views", "login.html"));
+  };
+  exports.postLogin = async (req, res, next) => {
+    try {
+      const Email = req.body.email;
+      const Password = req.body.password;
+      //console.log(Email, Password);
+      console.log(req.body);
+      
+      
+      const emailfind = await Users.findOne({
+        where: {
+          email: Email,
+        },
+      });
+      console.log(emailfind,"emailfind")
+      function jwtToken() {
+        return jwt.sign(
+          {
+            useremail: emailfind.email,
+            userid: emailfind.id,
+            totalExpenses: emailfind.totalExpenses,
+            premium: emailfind.isPremiumUser,
+          },
+          "hgtyf1f51ge5ef555sb1f5"
+        );
+      }
+  
+      if (!emailfind) {
+        res.status(404).json({ users: "email not exits please signup" });
+      } else {
+        const resp = await bcrypt.compare(Password, emailfind.password);
+  
+        if (resp) {
+          res
+            .status(200)
+            .json({ login: resp, data: emailfind, token: jwtToken() });
+        } else {
+          res.status(401).json({ login: "check your password" });
+        }
+        
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        error: error,
+      });
+    }
+  };
