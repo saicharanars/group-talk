@@ -13,9 +13,11 @@ app.use(bodyParser.json({ extended: false }));
 const { sequelize } = require('./models/user');
 const Users = require("./models/user");
 const userRoutes=require("./routes/user");
+const chatRoutes=require("./routes/chat");
 console.log("gdyd")
 
 app.use(userRoutes);
+app.use(chatRoutes);
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.static('public'));
 

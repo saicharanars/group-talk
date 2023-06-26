@@ -16,7 +16,7 @@ async function userlogin(event) {
     if (resp.data.login) {
       localStorage.setItem('token',resp.data.token);
       console.log(localStorage.getItem('token'));
-      window.location.href = "/";
+      window.location.href = "/get-chat";
     } else {
       console.log("fail");
     }
