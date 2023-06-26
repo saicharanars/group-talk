@@ -28,3 +28,15 @@ exports.postChat=async(req,res,next)=>{
         });
       }
 }
+exports.getMessages=async(req,res,next)=>{
+    try {
+        const resp=await Chat.findAll();
+        res.status(200).json({ message: "success", data:resp });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+          error: error,
+        });
+    }
+}
