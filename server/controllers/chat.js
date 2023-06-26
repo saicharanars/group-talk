@@ -1,6 +1,8 @@
 const path = require("path");
 const rootDir = path.dirname(__dirname);
 const Chat =require("../models/chat")
+const { Op } = require('sequelize');
+
 
 exports.getChat = async (req, res, next) => {
     res.sendFile(path.join(rootDir, "views", "chat.html"));
@@ -30,7 +32,12 @@ exports.postChat=async(req,res,next)=>{
 }
 exports.getMessages=async(req,res,next)=>{
     try {
-        const resp=await Chat.findAll();
+        const { lastReceivedTimestamp } = req.query;
+        console.log(lastReceivedTimestamp)
+        const resp=await Chat.findAll(
+            
+        );
+        console.log(resp)
         res.status(200).json({ message: "success", data:resp });
 
     } catch (error) {
