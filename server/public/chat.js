@@ -1,42 +1,79 @@
 var api = "http://localhost:4000/";
 var msglength=0;
+const storedchatslength=10;
 document.addEventListener("DOMContentLoaded", async () => {
-  const token = localStorage.getItem("token");
-  console.log(token);
-  const resp = await axios.get(`${api}get-messages`);
-  const msgs = resp.data.data;
-
-  if (msgs.length > 0) {
-    for (let i = 0; i < msgs.length; i++) {
-      const messageElement = document.getElementById("msg");
-      const head = document.createElement("h1");
-      head.innerText = msgs[i].message;
-      messageElement.appendChild(head);
-    }
-     msglength=msgs.length;
-  } else {
-    const messageElement = document.getElementById("msg");
-    const head = document.createElement("h1");
-    head.innerText = "no messages";
-    messageElement.appendChild(head);
-  }
+    // const resp = await axios.get(`${api}get-messages`);
+    // const newMessages = resp.data.data;
+    // console.log(newMessages,"after api call")
+    // const chats=newMessages.splice(newMessages.length-storedchatslength);
+    // localStorage.setItem("chats", JSON.stringify(chats));
+    try {
+        // Retrieve messages from local storage
+        const storedMessages = JSON.parse(localStorage.getItem('chats')) || [];
+        console.log(storedMessages);
+        const lastStoredMessage = storedMessages.length > 0 ? storedMessages[storedMessages.length - 1] : -1;
+        console.log(lastStoredMessage,">>>>>>>")
+          //console.log(storedMessages,"local storage")
+        // Make a request to the server for new messages
+        const resp = await axios.get(`${api}get-messages?after=${lastStoredMessage.id}`);
+        const newMessages = resp.data.data;
+        console.log(newMessages,"after api call")
+        const allmessages=[...storedMessages,...newMessages]
+        const chats=allmessages.splice(allmessages.length-storedchatslength);
+        console.log( allmessages,"allmesg>>>>",chats,"chats>>>>>")
+        //localStorage.setItem("chats", JSON.stringify(chats));
+        console.log(chats);
+        chats.forEach((chat) => {
+          const messageElement = document.getElementById("msg");
+          const head = document.createElement("h1");
+          head.innerText = chat.message;
+          messageElement.appendChild(head);
+          msglength=chat.id
+        })
+        console.log(JSON.stringify([...storedMessages, ...newMessages]),">>>>>>");
+        console.log(msglength)
+        
+      } catch (error) {
+        console.error('An error occurred:', error);
+      }
+  
 
   setInterval(async () => {
-    const resp = await axios.get(`${api}get-messages`);
-    const msgs = resp.data.data;
-    //msglength=msgs.length;
-    if (msgs.length > msglength ) {
-      for (let i = msglength; i < msgs.length; i++) {
-        const messageElement = document.getElementById("msg");
-        const head = document.createElement("h1");
-        head.innerText = msgs[i].message;
-        messageElement.appendChild(head);
-      }
-      msglength = msgs.length;
-    } else {
-      console.log("no new messages");
+    try {
+      // Retrieve messages from local storage
+      const storedMessages = JSON.parse(localStorage.getItem('chats')) || [];
+      const lastStoredMessage = storedMessages.length > 0 ? storedMessages[storedMessages.length - 1] : -1;
+        console.log(lastStoredMessage.id,"lastStoredMessage>>>>>>",)
+      // Make a request to the server for new messages
+      const resp = await axios.get(`${api}get-messages?after=${lastStoredMessage.id}`);
+      const newMessages = resp.data.data;
+      console.log(newMessages,"after api call")
+      const allmessages=[...storedMessages,...newMessages]
+      const chats=allmessages.splice(allmessages.length-storedchatslength);
+      console.log( allmessages,"allmesg>>>>",chats,"chats>>>>>")
+      localStorage.setItem("chats", JSON.stringify(chats));
+    
+      chats.forEach((chat) => {
+        if(chat.id>msglength){
+            const messageElement = document.getElementById("msg");
+            const head = document.createElement("h1");
+            head.innerText = chat.message;
+            console.log(chat.message);
+            messageElement.appendChild(head);
+            msglength=chat.id
+
+        }else{
+            console.log("no new messages")
+        }
+        
+      })
+      //console.log(JSON.stringify([...storedMessages, ...newMessages]),">>>>>>");
+      
+    } catch (error) {
+      console.error('An error occurred:', error);
     }
   }, 5000);
+  
 });
 
 async function message(event) {

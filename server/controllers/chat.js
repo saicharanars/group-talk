@@ -32,10 +32,14 @@ exports.postChat=async(req,res,next)=>{
 }
 exports.getMessages=async(req,res,next)=>{
     try {
-        const { lastReceivedTimestamp } = req.query;
-        console.log(lastReceivedTimestamp)
+        
+        const lastmessageid = req.query.after;
+        //console.log(lastReceivedTimestamp)
         const resp=await Chat.findAll(
-            
+            {
+            where : { id: { [Op.gt]: lastmessageid }},
+            attributes: ['id', 'message'],
+         },
         );
         console.log(resp)
         res.status(200).json({ message: "success", data:resp });
