@@ -11,14 +11,18 @@ exports.postChat=async(req,res,next)=>{
     try {
         //const { name, email, phone } = req.body;
        
-        const message = req.body.message;
-        
+        console.log(req.user);
+        console.log(req.body);
+        message=req.body.message;
+        groupid=req.body.groupid
     
-        const userId = req.user.userid;
+        const userId = req.user.id;
         console.log(userId);
         const data = await Chat.create({
           message:message ,
-          groupuserId:userId
+          groupuserId:userId,
+          groupId:groupid,
+          
         });
         console.log(data)
         res.status(200).json({ message: "success", data:data });

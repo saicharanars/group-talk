@@ -1,3 +1,5 @@
+
+
 var api = "http://localhost:4000/";
 
 async function userlogin(event) {
@@ -11,11 +13,19 @@ async function userlogin(event) {
   };
   try {
     const resp = await axios.post(`${api}login`, obj);
-    console.log(resp.data);
-
+    console.log(resp.data.data.groups);
+    //const groupchat= await axios.get(`${api}get-groupchat`);
+    console.log("groupchat");
+    
+    //const groupmember= await axios.get(`${api}addmember/8`);
+    //console.log(groupmember);
+    
     if (resp.data.login) {
       localStorage.setItem('token',resp.data.token);
       console.log(localStorage.getItem('token'));
+      localStorage.setItem('group',JSON.stringify(resp.data.data.groups));
+      console.log(localStorage.getItem('group'));
+
       window.location.href = "/get-chat";
     } else {
       console.log("fail");

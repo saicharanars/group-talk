@@ -11,7 +11,11 @@ const GroupMember = sequelize.define("groupmember", {
     autoIncrement: true,
     primaryKey: true,
   },
-  
+  isAdmin: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   
   
 });
