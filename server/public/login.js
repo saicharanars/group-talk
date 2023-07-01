@@ -1,8 +1,8 @@
 
 
-https://3.109.101.125:4000/
+var api= "http://3.109.101.125:4000/";
 
-(async function userlogin(event) {
+async function userlogin(event) {
   event.preventDefault();
   //const username = document.getElementById("username").value;
   const email = document.getElementById("email").value;
@@ -34,4 +34,4 @@ https://3.109.101.125:4000/
   } catch (error) {
     console.log(error);
   }
-})();
+}

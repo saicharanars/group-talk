@@ -1,4 +1,4 @@
-https://3.109.101.125:4000/
+var api= "http://3.109.101.125:4000/";
 var msglength = 0;
 const storedchatslength = 10;
 document.addEventListener("DOMContentLoaded", async () => {
