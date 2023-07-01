@@ -1,4 +1,4 @@
-var api = "http://localhost:4000/";
+http://3.109.101.125:5000/
 var msglength = 0;
 const storedchatslength = 10;
 document.addEventListener("DOMContentLoaded", async () => {
