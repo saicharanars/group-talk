@@ -20,7 +20,7 @@ const chatRoutes=require("./routes/chat");
 const groupRoutes=require("./routes/group");
 app.use(express.json());
 app.use(cors({
-    origin:"http://localhost:4000/",
+    origin:"https://localhost:4000/",
     methods:["GET","POST","PUT","DELETE"],
 }));
 app.use(
@@ -75,4 +75,4 @@ sequelize
     //console.log(err);
   });
 
-app.listen(5000);
+app.listen(4000);
