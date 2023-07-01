@@ -39,10 +39,11 @@ exports.postSignup = async (req, res, next) => {
 };
 
 exports.getSignup = async (req, res, next) => {
-  console.log(rootDir);
+  console.log(rootDir,"gugfygtyfd");
   res.sendFile(path.join(rootDir, "views", "signup.html"));
 };
 exports.getLogin = async (req, res, next) => {
+    console.log(rootDir,"gugfygtyfd");
   res.sendFile(path.join(rootDir, "views", "login.html"));
 };
 exports.postLogin = async (req, res, next) => {

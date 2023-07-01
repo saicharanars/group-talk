@@ -13,7 +13,7 @@ async function userlogin(event) {
   };
   try {
     const resp = await axios.post(`${api}login`, obj);
-    console.log(resp.data.data.groups);
+    console.log(resp);
     //const groupchat= await axios.get(`${api}get-groupchat`);
     console.log("groupchat");
     
