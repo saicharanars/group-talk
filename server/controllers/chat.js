@@ -25,7 +25,7 @@ exports.postChat=async(req,res,next)=>{
           
         });
         console.log(data)
-        res.status(200).json({ message: "success", data:data });
+        res.status(200).json({ message: "success", data:data,username:req.user.username });
       } catch (error) {
         
         console.log(error);

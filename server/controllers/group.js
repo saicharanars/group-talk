@@ -78,7 +78,7 @@ exports.getGroupChat = async (req, res, next) => {
           include: [
             {
               model: User,
-              attributes: ["username"],
+              attributes: ["username","id"],
             },
           ],
           order: [["createdAt", "DESC"]],

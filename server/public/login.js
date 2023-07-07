@@ -1,6 +1,5 @@
-
-
 var api= "http://3.109.101.125:4000/";
+
 
 async function userlogin(event) {
   event.preventDefault();
@@ -23,6 +22,7 @@ async function userlogin(event) {
     if (resp.data.login) {
       localStorage.setItem('token',resp.data.token);
       console.log(localStorage.getItem('token'));
+      localStorage.setItem('user',resp.data.data.id);
       localStorage.setItem('group',JSON.stringify(resp.data.data.groups));
       console.log(localStorage.getItem('group'));
 

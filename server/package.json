@@ -4,7 +4,8 @@
   "description": "Group chat Application",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
   },
   "author": "sai charan arishanapally",
   "license": "ISC",
@@ -19,7 +20,9 @@
     "morgan": "^1.10.0",
     "mysql2": "^3.4.1",
     "nodemon": "^2.0.22",
-    "sequelize": "^6.32.1"
+    "sequelize": "^6.32.1",
+    "socket.io": "^4.7.1",
+    "socket.io-client": "^4.7.1"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.14",

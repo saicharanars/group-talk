@@ -1,6 +1,52 @@
+
+
+const socket = io("http://localhost:3000");
+socket.on("connection",(socket)=>{
+    console.log(socket.id)
+    socket.on("chat", (message) => {
+        console.log(message);
+      //document.getElementById("messages").innerHTML += message + "<br>";
+    });
+    socket.on("group", (handleGroup)=>{
+        console.log(handleGroup);
+    });
+    
+
+})
+
+const joinRoom = (room) => {
+    socket.emit("join", room);
+  };
+  
+  const leaveRoom = (room) => {
+    socket.emit("leave", room);
+  };
+  
+//   const sendMessage = (room, message) => {
+//     socket.emit("message", { room, message });
+//   };
+
+//     // Handle received groups
+//     console.log(groups);
+//     //joinGroup('Group1');
+
+//     //socket.emit('chat', { group3, mess });
+//      // Or perform any other operations
+
+
 var api= "http://3.109.101.125:4000/";
+
 var msglength = 0;
 const storedchatslength = 10;
+
+// function sendChatMessage(group, message) {
+//   socket.to(group).emit("chat", { message });
+// }
+// function joinGroup(group) {
+//   //socket.emit("disconnecting",socket.rooms)  
+//   socket.emit("join", {group,leave: current});
+// }
+
 document.addEventListener("DOMContentLoaded", async () => {
   // const resp = await axios.get(`${api}get-messages`);
   // const newMessages = resp.data.data;
@@ -8,9 +54,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   // const chats=newMessages.splice(newMessages.length-storedchatslength);
   // localStorage.setItem("chats", JSON.stringify(chats));
   //console.log(res.body);
-
+    
   try {
     // Retrieve messages from local storage
+    
     getGroups();
     activegroups();
     chatheader();
@@ -141,8 +188,17 @@ async function message(event) {
         Authorization: token,
       },
     });
+    
     console.log(resp.data);
-
+    try {
+        
+        socket.emit("msg2",{message:msg,group:groupId,username:resp.data.username,userid:resp.data.data.groupuserId,timestamp:resp.data.data.createdAt});
+        document.getElementById("message").value="";
+        document.getElementById("chatui").scrollTop = scrollHeight;
+    } catch (error) {
+        console.log(error)
+    }
+    
     // const messageElement = document.getElementById("msg");
     // const head = document.createElement("h1");
     // head.innerText = msg;
@@ -167,6 +223,7 @@ async function creategroup(event) {
       },
     });
     console.log(resp.data, "add group>>>>");
+    socket.emit("group", groupname, resp.data);
   } catch (error) {
     console.log("Error while sending message:", error);
   }
@@ -176,32 +233,35 @@ async function getGroups() {
   const grouparray = JSON.parse(grouparrayString);
   console.log(grouparray);
   grouparray.forEach((group) => {
-    console.log(group);
-    const groupbutton = document.createElement("button");
-    groupbutton.className =
-      "flex flex-row items-center hover:bg-gray-100 rounded-xl p-2";
-    groupbutton.id = group.id;
-    const ava = document.createElement("div");
-    ava.className =
-      "flex items-center justify-center h-8 w-8 bg-indigo-200 rounded-full";
-    ava.innerText = group.groupname[0];
-    const text = document.createElement("div");
-    text.className = "ml-2 text-sm font-semibold";
-    text.innerText = group.groupname;
-    groupbutton.append(ava);
-    groupbutton.append(text);
-    const handleClick = (event) => {
-      const groupId = event.currentTarget.closest("button").id;
-      console.log("Clicked button with groupId:", groupId);
-      // Perform your desired action with the groupId
-    };
-
-    groupbutton.addEventListener("click", handleClick);
-    ava.addEventListener("click", handleClick);
-    text.addEventListener("click", handleClick);
-    const groupele = document.getElementById("activegroup");
-    groupele.append(groupbutton);
+    addgroup(group);
   });
+}
+function addgroup(group, groupname) {
+  console.log(group);
+  const groupbutton = document.createElement("button");
+  groupbutton.className =
+    "flex flex-row items-center hover:bg-gray-100 rounded-xl p-2";
+  groupbutton.id = group.id;
+  const ava = document.createElement("div");
+  ava.className =
+    "flex items-center justify-center h-8 w-8 bg-indigo-200 rounded-full";
+  ava.innerText = group.groupname ? group.groupname[0] : groupname[0];
+  const text = document.createElement("div");
+  text.className = "ml-2 text-sm font-semibold";
+  text.innerText = group.groupname ? group.groupname : groupname;
+  groupbutton.append(ava);
+  groupbutton.append(text);
+  const handleClick = (event) => {
+    const groupId = event.currentTarget.closest("button").id;
+    console.log("Clicked button with groupId:", groupId);
+    // Perform your desired action with the groupId
+  };
+
+  groupbutton.addEventListener("click", handleClick);
+  ava.addEventListener("click", handleClick);
+  text.addEventListener("click", handleClick);
+  const groupele = document.getElementById("activegroup");
+  groupele.append(groupbutton);
 }
 // Assign event listener to form submit event
 document.getElementById("myForm").addEventListener("submit", message);
@@ -220,6 +280,9 @@ function activegroups() {
       // myAPIFunction(groupId);
       fetchmessages(groupId);
       console.log("Clicked button with groupId:", groupId);
+      let current=groupId
+      joinRoom(groupId);
+      getchat(groupId);
     });
   });
 }
@@ -251,36 +314,22 @@ function chatui(chats) {
   parent.innerHTML = "";
   if (chats && chats.length > 0) {
     chats.reverse().forEach((chat) => {
-      const child = document.createElement("div");
-      child.className = "col-start-1 col-end-8 p-3 rounded-lg";
-      const innerchild = document.createElement("div");
-      innerchild.className = "flex flex-row items-center";
-      const avatar = document.createElement("div");
-      avatar.className =
-        "flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0";
-      avatar.innerText = "a";
-      const messageouter = document.createElement("div");
-      messageouter.className =
-        "flex flex-col justify-between items-end relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl";
-      const messagetext = document.createElement("div");
-      messagetext.className = "self-end";
-      const messagetextp = document.createElement("p");
-
-      messagetextp.textContent = chat.groupuser.username;
-      messagetextp.className = "self-end";
-      messagetext.append(messagetextp);
-
-      const usernametext = document.createElement("div");
-      usernametext.textContent = chat.message;
-
-      messageouter.appendChild(usernametext);
-      messageouter.appendChild(messagetext);
-      innerchild.append(avatar);
-      innerchild.append(messageouter);
-      //innerchild.append(username)
-      child.append(innerchild);
-      parent.append(child);
-      msglength = chat.id;
+      const obj={
+        username:chat.groupuser.username,
+        message:chat.message,
+        userid:chat.groupuser.id,
+      }
+      const userid= localStorage.getItem("user")   
+      let floatleft; 
+        if (obj.userid===Number(userid)){
+            showmessage(obj,true)
+            console.log("left")
+        }else{
+            showmessage(obj,false) 
+            console.log("rifght",false)
+        }
+      
+    
     });
   } else {
     console.log("no messages");
@@ -503,36 +552,119 @@ async function createadminui(admintype) {
   parent.append(child);
 }
 function getuserbutton() {
-    document
+  document
     .getElementById("groupuserscheck")
     .addEventListener("click", async (e) => {
-    e.preventDefault();
-    console.log("gnj");
-    checkusers()
-  });
+      e.preventDefault();
+      console.log("gnj");
+      checkusers();
+    });
 }
 async function checkusers() {
-    const group = document.getElementById("groupuserscheck");
-    const groupid = group.getAttribute("data-group-id");
-    console.log(groupid);
-    const getusers = await axios.get(`${api}getgroupmembers/${groupid}`);
-    const usersarray = getusers.data.users[0].groupusers;
-    console.log(usersarray);
-    
-    const parent = document.getElementById("chatui");
-    parent.className = "grid grid-cols-12 gap-y-2 bg-white ";
-    parent.innerHTML = ""; // Clear previous content before appending new users.
+  const group = document.getElementById("groupuserscheck");
+  const groupid = group.getAttribute("data-group-id");
+  console.log(groupid);
+  const getusers = await axios.get(`${api}getgroupmembers/${groupid}`);
+  const usersarray = getusers.data.users[0].groupusers;
+  console.log(usersarray);
+
+  const parent = document.getElementById("chatui");
+  parent.className = "grid grid-cols-12 gap-y-2 bg-white ";
+  parent.innerHTML = ""; // Clear previous content before appending new users.
+
+  usersarray.forEach((user) => {
+    const child = document.createElement("div");
+    child.className = "col-start-1 col-end-8 p-3 rounded-lg";
+
+    const inner = document.createElement("h1");
+    inner.className = "text-2xl font-bold";
+    inner.textContent = user.username;
+
+    child.append(inner);
+    parent.append(child); // Append the current user's div to the parent div.
+  });
+}
+async function getchat(groupid){
+    console.log(groupid,"getchat");
+
+    socket.on(groupid,(obj)=>{
+        console.log(obj.data.userid,"obj?????")
+        const userid= localStorage.getItem("user")  
+        console.log(typeof(obj.data.userid),typeof(userid))
+        let floatleft; 
+        if (obj.data.userid===Number(userid)){
+            showmessage(obj.data,true)
+            console.log("left")
+        }else{
+            showmessage(obj.data) 
+            console.log("rifght",false)
+        }
+        
+    })
+
+}
+function showmessage(obj,floatleft) {
+   console.log(obj,floatleft)
+  const timestamp = getCurrentTime();
+  //const time2=timestamp.getHours() + ':' + timestamp.getMinutes();
+  const child = document.createElement("div");
+  child.className = floatleft?"col-start-6 col-end-13 p-3 rounded-lg":"col-start-1 col-end-8 p-3 rounded-lg";
+  const innerchild = document.createElement("div");
+  innerchild.className = floatleft?"flex items-center justify-start flex-row-reverse":"flex flex-row items-center";
+  const avatar = document.createElement("div");
+  avatar.className =
+    "flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0";
+  avatar.innerText = "a";
+  const messageouter = document.createElement("div");
+  messageouter.className =
+    "flex flex-col justify-between items-end relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl";
+  const messagetext = document.createElement("div");
+  messagetext.className = "self-start";
+  const messagetextp = document.createElement("p");
+
+  messagetextp.textContent = obj.message;
+  messagetextp.className = "self-start flex text-green-400 bg-white-200";
+  messagetext.append(messagetextp);
+
+  const usernametext = document.createElement("div");
+
+  usernametext.className = "flex text-green-400 bg-white-200";
+  usernametext.textContent = obj.username;
+  const time = document.createElement("p");
+
+  time.textContent = timestamp;
+  time.className = "self-end";
+  messagetext.append(time);
+
+  messageouter.appendChild(usernametext);
+  messageouter.appendChild(messagetext);
+  messageouter.appendChild(time);
+  innerchild.append(avatar);
+  innerchild.append(messageouter);
+  //innerchild.append(username)
+  child.append(innerchild);
+  const parent = document.getElementById("chatui");
+  parent.append(child);
+  //msglength = obj.id;
+}
+function getCurrentTime() {
+    let date = new Date();
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    let ampm = hours >= 12 ? 'pm' : 'am';
   
-    usersarray.forEach((user) => {
-      const child = document.createElement("div");
-      child.className = "col-start-1 col-end-8 p-3 rounded-lg";
-      
-      const inner = document.createElement("h1");
-      inner.className = "text-2xl font-bold";
-      inner.textContent = user.username;
-      
-      child.append(inner);
-      parent.append(child); // Append the current user's div to the parent div.
-    });
+    // Convert to 12-hour format
+    hours = hours % 12;
+    hours = hours ? hours : 12; // "0" should be converted to "12"
+  
+    // Add leading zeros to minutes
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+  
+    // Construct the time string
+    const timeString = hours + ':' + minutes + ' ' + ampm;
+  
+    return timeString;
   }
+  
+  
   
