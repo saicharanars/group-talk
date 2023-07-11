@@ -193,8 +193,8 @@ async function message(event) {
     try {
         
         socket.emit("msg2",{message:msg,group:groupId,username:resp.data.username,userid:resp.data.data.groupuserId,timestamp:resp.data.data.createdAt});
-        document.getElementById("message").value="";
-        document.getElementById("chatui").scrollTop = scrollHeight;
+        //document.getElementById("message").value="";
+        //document.getElementById("chatui").scrollTop = scrollHeight;
     } catch (error) {
         console.log(error)
     }
