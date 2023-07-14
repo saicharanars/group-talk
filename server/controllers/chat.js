@@ -2,6 +2,9 @@ const path = require("path");
 const rootDir = path.dirname(__dirname);
 const Chat =require("../models/chat")
 const { Op } = require('sequelize');
+const multer = require('multer');
+const { uploadToS3 } = require('../services/s3service');
+const upload = multer({ dest: 'uploads/' });
 
 
 exports.getChat = async (req, res, next) => {
@@ -10,18 +13,22 @@ exports.getChat = async (req, res, next) => {
 exports.postChat=async(req,res,next)=>{
     try {
         //const { name, email, phone } = req.body;
-       
+        console.log("Request Body:", req.body);
+        console.log("Request File:", req.file);
         console.log(req.user);
         console.log(req.body);
         message=req.body.message;
         groupid=req.body.groupid
-    
+        const image = req.file;
         const userId = req.user.id;
         console.log(userId);
+        console.log(image);
+        const s3response = await uploadToS3(image.path, image.filename);
         const data = await Chat.create({
           message:message ,
           groupuserId:userId,
           groupId:groupid,
+          imageUrl: s3response,
           
         });
         console.log(data)

@@ -1,27 +1,23 @@
-
-
 const socket = io("http://localhost:3000");
-socket.on("connection",(socket)=>{
-    console.log(socket.id)
-    socket.on("chat", (message) => {
-        console.log(message);
-      //document.getElementById("messages").innerHTML += message + "<br>";
-    });
-    socket.on("group", (handleGroup)=>{
-        console.log(handleGroup);
-    });
-    
-
-})
+socket.on("connection", (socket) => {
+  console.log(socket.id);
+  socket.on("chat", (message) => {
+    console.log(message);
+    //document.getElementById("messages").innerHTML += message + "<br>";
+  });
+  socket.on("group", (handleGroup) => {
+    console.log(handleGroup);
+  });
+});
 
 const joinRoom = (room) => {
-    socket.emit("join", room);
-  };
-  
-  const leaveRoom = (room) => {
-    socket.emit("leave", room);
-  };
-  
+  socket.emit("join", room);
+};
+
+const leaveRoom = (room) => {
+  socket.emit("leave", room);
+};
+
 //   const sendMessage = (room, message) => {
 //     socket.emit("message", { room, message });
 //   };
@@ -33,8 +29,7 @@ const joinRoom = (room) => {
 //     //socket.emit('chat', { group3, mess });
 //      // Or perform any other operations
 
-
-var api= "http://3.109.101.125:4000/";
+var api = "http://3.109.101.125:4000/";
 
 var msglength = 0;
 const storedchatslength = 10;
@@ -43,7 +38,7 @@ const storedchatslength = 10;
 //   socket.to(group).emit("chat", { message });
 // }
 // function joinGroup(group) {
-//   //socket.emit("disconnecting",socket.rooms)  
+//   //socket.emit("disconnecting",socket.rooms)
 //   socket.emit("join", {group,leave: current});
 // }
 
@@ -54,15 +49,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   // const chats=newMessages.splice(newMessages.length-storedchatslength);
   // localStorage.setItem("chats", JSON.stringify(chats));
   //console.log(res.body);
-    
+
   try {
     // Retrieve messages from local storage
-    
+
     getGroups();
     activegroups();
     chatheader();
     adduserbutton();
     getuserbutton();
+    message();
     //     const storedMessages = JSON.parse(localStorage.getItem("chats")) || [];
     //     console.log(storedMessages);
     //     const lastStoredMessage =
@@ -169,36 +165,71 @@ document.addEventListener("DOMContentLoaded", async () => {
   //   }, 5000);
   //});
 });
-async function message(event) {
-  event.preventDefault();
-  const token = localStorage.getItem("token");
-  const msg = document.getElementById("message").value;
-  const ele = document.getElementById("sendmessage");
-  const span = ele.querySelector("span");
-  console.log(msg, ">>>>", span.id);
-  const groupId = span.id;
-  const msg1 = {
-    message: msg,
-    groupid: groupId,
-  };
+let formData1;
+function message() {
+  const fileInput = document.getElementById("file-input");
+  formData1 = new FormData();
+  
+  fileInput.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    // Append the groupid value to the formData1
+    formData1.append("image", file);
+    console.log(formData1.entries, formData1.keys, formData1.values);
 
+    for (let obj of formData1) {
+      console.log(obj);
+    }
+
+    return formData1; // Append the file to the FormData
+  });
+}
+//message();
+
+document.getElementById("myForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const token = localStorage.getItem("token");
+  const formData1 = new FormData();
+  const fileInput = document.getElementById("file-input");
+  for (const file of fileInput.files) {
+    formData1.append("image", file);
+  }
+  const msg = document.getElementById("message").value;
+
+  const groupId = document
+    .getElementById("sendmessage")
+    .querySelector("span").id;
+  // Create a new FormData object
+  //console.log(formData1);
+
+  formData1.append("message", msg); // Append the message value to the formData1
+  formData1.append("groupid", groupId);
+  for (let obj of formData1) {
+    console.log(obj);
+  }
   try {
-    const resp = await axios.post(`${api}message`, msg1, {
+    const resp = await axios.post(`${api}message`, formData1, {
       headers: {
         Authorization: token,
+        "Content-Type": "multipart/form-data",
       },
     });
-    
+
     console.log(resp.data);
     try {
-        
-        socket.emit("msg2",{message:msg,group:groupId,username:resp.data.username,userid:resp.data.data.groupuserId,timestamp:resp.data.data.createdAt});
-        //document.getElementById("message").value="";
-        //document.getElementById("chatui").scrollTop = scrollHeight;
+      socket.emit("msg2", {
+        message: msg,
+        group: groupId,
+        username: resp.data.username,
+        userid: resp.data.data.groupuserId,
+        timestamp: resp.data.data.createdAt,
+      });
+      // document.getElementById("message").value = "";
+      // document.getElementById("chatui").scrollTop = scrollHeight;
     } catch (error) {
-        console.log(error)
+      console.log(error);
     }
-    
+
     // const messageElement = document.getElementById("msg");
     // const head = document.createElement("h1");
     // head.innerText = msg;
@@ -206,7 +237,11 @@ async function message(event) {
   } catch (error) {
     console.log("Error while sending message:", error);
   }
-}
+});
+
+// Attach event listener to the Send button
+//document.getElementById("sendmessage").addEventListener("click", message);
+
 async function creategroup(event) {
   event.preventDefault();
   const token = localStorage.getItem("token");
@@ -280,7 +315,7 @@ function activegroups() {
       // myAPIFunction(groupId);
       fetchmessages(groupId);
       console.log("Clicked button with groupId:", groupId);
-      let current=groupId
+      let current = groupId;
       joinRoom(groupId);
       getchat(groupId);
     });
@@ -314,22 +349,20 @@ function chatui(chats) {
   parent.innerHTML = "";
   if (chats && chats.length > 0) {
     chats.reverse().forEach((chat) => {
-      const obj={
-        username:chat.groupuser.username,
-        message:chat.message,
-        userid:chat.groupuser.id,
+      const obj = {
+        username: chat.groupuser.username,
+        message: chat.message,
+        userid: chat.groupuser.id,
+      };
+      const userid = localStorage.getItem("user");
+      let floatleft;
+      if (obj.userid === Number(userid)) {
+        showmessage(obj, true);
+        console.log("left");
+      } else {
+        showmessage(obj, false);
+        console.log("rifght", false);
       }
-      const userid= localStorage.getItem("user")   
-      let floatleft; 
-        if (obj.userid===Number(userid)){
-            showmessage(obj,true)
-            console.log("left")
-        }else{
-            showmessage(obj,false) 
-            console.log("rifght",false)
-        }
-      
-    
     });
   } else {
     console.log("no messages");
@@ -584,33 +617,35 @@ async function checkusers() {
     parent.append(child); // Append the current user's div to the parent div.
   });
 }
-async function getchat(groupid){
-    console.log(groupid,"getchat");
+async function getchat(groupid) {
+  console.log(groupid, "getchat");
 
-    socket.on(groupid,(obj)=>{
-        console.log(obj.data.userid,"obj?????")
-        const userid= localStorage.getItem("user")  
-        console.log(typeof(obj.data.userid),typeof(userid))
-        let floatleft; 
-        if (obj.data.userid===Number(userid)){
-            showmessage(obj.data,true)
-            console.log("left")
-        }else{
-            showmessage(obj.data) 
-            console.log("rifght",false)
-        }
-        
-    })
-
+  socket.on(groupid, (obj) => {
+    console.log(obj.data.userid, "obj?????");
+    const userid = localStorage.getItem("user");
+    console.log(typeof obj.data.userid, typeof userid);
+    let floatleft;
+    if (obj.data.userid === Number(userid)) {
+      showmessage(obj.data, true);
+      console.log("left");
+    } else {
+      showmessage(obj.data);
+      console.log("rifght", false);
+    }
+  });
 }
-function showmessage(obj,floatleft) {
-   console.log(obj,floatleft)
+function showmessage(obj, floatleft) {
+  console.log(obj, floatleft);
   const timestamp = getCurrentTime();
   //const time2=timestamp.getHours() + ':' + timestamp.getMinutes();
   const child = document.createElement("div");
-  child.className = floatleft?"col-start-6 col-end-13 p-3 rounded-lg":"col-start-1 col-end-8 p-3 rounded-lg";
+  child.className = floatleft
+    ? "col-start-6 col-end-13 p-3 rounded-lg"
+    : "col-start-1 col-end-8 p-3 rounded-lg";
   const innerchild = document.createElement("div");
-  innerchild.className = floatleft?"flex items-center justify-start flex-row-reverse":"flex flex-row items-center";
+  innerchild.className = floatleft
+    ? "flex items-center justify-start flex-row-reverse"
+    : "flex flex-row items-center";
   const avatar = document.createElement("div");
   avatar.className =
     "flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 flex-shrink-0";
@@ -648,23 +683,24 @@ function showmessage(obj,floatleft) {
   //msglength = obj.id;
 }
 function getCurrentTime() {
-    let date = new Date();
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-    let ampm = hours >= 12 ? 'pm' : 'am';
-  
-    // Convert to 12-hour format
-    hours = hours % 12;
-    hours = hours ? hours : 12; // "0" should be converted to "12"
-  
-    // Add leading zeros to minutes
-    minutes = minutes < 10 ? '0' + minutes : minutes;
-  
-    // Construct the time string
-    const timeString = hours + ':' + minutes + ' ' + ampm;
-  
-    return timeString;
-  }
-  
-  
-  
+  let date = new Date();
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  let ampm = hours >= 12 ? "pm" : "am";
+
+  // Convert to 12-hour format
+  hours = hours % 12;
+  hours = hours ? hours : 12; // "0" should be converted to "12"
+
+  // Add leading zeros to minutes
+  minutes = minutes < 10 ? "0" + minutes : minutes;
+
+  // Construct the time string
+  const timeString = hours + ":" + minutes + " " + ampm;
+
+  return timeString;
+}
+
+function chooseFile() {
+  document.getElementById("file-input").click();
+}
