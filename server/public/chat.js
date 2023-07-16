@@ -169,7 +169,7 @@ let formData1;
 function message() {
   const fileInput = document.getElementById("file-input");
   formData1 = new FormData();
-  
+
   fileInput.addEventListener("change", (event) => {
     const file = event.target.files[0];
     // Append the groupid value to the formData1
@@ -215,21 +215,67 @@ document.getElementById("myForm").addEventListener("submit", async (event) => {
       },
     });
 
-    console.log(resp.data);
-    try {
-      socket.emit("msg2", {
-        message: msg,
-        group: groupId,
-        username: resp.data.username,
-        userid: resp.data.data.groupuserId,
-        timestamp: resp.data.data.createdAt,
-      });
-      // document.getElementById("message").value = "";
-      // document.getElementById("chatui").scrollTop = scrollHeight;
-    } catch (error) {
-      console.log(error);
+    console.log(resp.data, "lghjk>>>>>>>>");
+    if (resp.data) {
+      if (resp.data.data.imageurl === undefined) {
+        console.log("im done");
+        try {
+          console.log("undef");
+          socket.emit("msg2", {
+            message: msg,
+            group: groupId,
+            username: resp.data.username,
+            userid: resp.data.data.groupuserId,
+            timestamp: resp.data.data.createdAt,
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        try {
+          console.log("def");
+          socket.emit("msg2", {
+            message: msg,
+            group: groupId,
+            username: resp.data.username,
+            userid: resp.data.data.groupuserId,
+            timestamp: resp.data.data.createdAt,
+            image: resp.data.data.imageurl,
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      }
     }
+    // try {
+    //   if (resp.data.imageurl === undefined) {
+    //     console.log("undef");
+    //     socket.emit("msg2", {
+    //       message: msg,
+    //       group: groupId,
+    //       username: resp.data.username,
+    //       userid: resp.data.data.groupuserId,
+    //       timestamp: resp.data.data.createdAt,
+    //     });
+    //   } else {
+    //     console.log("def");
+    //     socket.emit("msg2", {
+    //       message: msg,
+    //       group: groupId,
+    //       username: resp.data.username,
+    //       userid: resp.data.data.groupuserId,
+    //       timestamp: resp.data.data.createdAt,
+    //       image: resp.data.imageurl,
+    //     });
+    //   }
 
+    //   // document.getElementById("message").value = "";
+    //   // document.getElementById("chatui").scrollTop = scrollHeight;
+    // } catch (error) {
+    //   console.log(error);
+    // }
+    fileInput.value = "";
+    document.getElementById("message").value = "";
     // const messageElement = document.getElementById("msg");
     // const head = document.createElement("h1");
     // head.innerText = msg;
@@ -665,6 +711,14 @@ function showmessage(obj, floatleft) {
 
   usernametext.className = "flex text-green-400 bg-white-200";
   usernametext.textContent = obj.username;
+
+  if (obj.image) {
+    const image = document.createElement("img");
+    image.src = obj.image;
+    image.className = "w-30 h-30";
+    messagetext.append(image);
+  }
+  //obj.image?messagetext.append(image):image.parentNode.removeChild(image);
   const time = document.createElement("p");
 
   time.textContent = timestamp;

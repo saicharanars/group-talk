@@ -1,10 +1,9 @@
 
 const Sequelize = require("sequelize");
 const sequelize = require("../util/database.js");
-const { Model } = require('sequelize');
 
 
-const Chat = sequelize.define("chat", {
+const archivedChat = sequelize.define("archivedChat", {
   id: {
     type: Sequelize.INTEGER,
     allowNull: false,
@@ -28,4 +27,4 @@ const Chat = sequelize.define("chat", {
 
 
 
-module.exports = Chat;
+module.exports = archivedChat;

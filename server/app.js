@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const helmet = require("helmet");
 const morgan = require("morgan");
-
+const CronJob = require('cron').CronJob;
 const express = require("express");
 const app = express();
 const http = require("http").Server(app);
@@ -133,7 +133,9 @@ Chat.belongsTo(Group);
 Group.hasMany(Chat);
 
 const errorController = require("./controllers/errorcontroller");
-const { group } = require("console");
+//const { group } = require("console");
+const job = require("./jobs/archivechat");
+job.start();
 
 app.use(errorController.get404);
 
